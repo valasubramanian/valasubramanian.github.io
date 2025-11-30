@@ -4,3 +4,4 @@ description: >-
 theme: minima
 plugins:
   - jekyll-feed
+permalink: /:year/:month/:day/:title.html
