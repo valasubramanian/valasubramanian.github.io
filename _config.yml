@@ -1,0 +1,6 @@
+title: Vala's Blog
+description: >-
+  Sharing my thoughts on open source, programming, and technology.
+theme: minima
+plugins:
+  - jekyll-feed
