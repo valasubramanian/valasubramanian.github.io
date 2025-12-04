@@ -82,61 +82,47 @@ While I cannot execute live code or access an actual Google ADK environment, I c
 Let's imagine an agent designed to extract product information from a user query, building upon our `ProductInfo` Pydantic model.
 
 ```python
-from pydantic import BaseModel, Field
-from typing import Optional, List
+from google_adk import AgentBuilder, OutputSchema
 
-# (Pydantic model definition from Section 2)
-class ProductInfo(BaseModel):
-    product_name: str = Field(description="The name of the product.")
-    brand: Optional[str] = Field(None, description="The brand of the product, if specified.")
-    category: Optional[str] = Field(None, description="The category of the product (e.g., electronics, clothing).")
-    price_range: Optional[str] = Field(None, description="The desired price range for the product.")
-    features: List[str] = Field(default_factory=list, description="A list of key features mentioned for the product.")
+agent_builder = AgentBuilder(name="ProductExtractor")
 
+ @agent_builder.register_tool(
+     name="extract_product_details",
+     description="Extracts structured product information from a user query.",
+     output_schema=OutputSchema(ProductInfo) # Here we link our Pydantic model
+ )
+ def extract_product_details_tool(query: str) -> ProductInfo:
+     # In a real scenario, this function would interact with an LLM
+     # to extract the information and then ensure it fits the ProductInfo schema.
+     # For demonstration, we'll simulate an output.
 
-# (Conceptual) How this might be used in a Google ADK agent definition
-# This part is illustrative and depends on the exact ADK API for agent definition.
+     # Simulate LLM extracting information and returning a dictionary
+     # which Pydantic will then validate and convert to ProductInfo
+     if "laptop" in query.lower():
+         return ProductInfo(
+             product_name="Laptop",
+             brand="Dell",
+             category="Electronics",
+             price_range="1000-1500 USD",
+             features=["lightweight", "long battery life"]
+         )
+     elif "t-shirt" in query.lower():
+         return ProductInfo(
+             product_name="T-Shirt",
+             brand="Nike",
+             category="Apparel",
+             features=["cotton", "crew neck"]
+         )
+     else:
+         return ProductInfo(product_name="Unknown Product")](url)
 
-# from google_adk import AgentBuilder, OutputSchema
-
-# agent_builder = AgentBuilder(name="ProductExtractor")
-
-# @agent_builder.register_tool(
-#     name="extract_product_details",
-#     description="Extracts structured product information from a user query.",
-#     output_schema=OutputSchema(ProductInfo) # Here we link our Pydantic model
-# )
-# def extract_product_details_tool(query: str) -> ProductInfo:
-#     # In a real scenario, this function would interact with an LLM
-#     # to extract the information and then ensure it fits the ProductInfo schema.
-#     # For demonstration, we'll simulate an output.
-
-#     # Simulate LLM extracting information and returning a dictionary
-#     # which Pydantic will then validate and convert to ProductInfo
-#     if "laptop" in query.lower():
-#         return ProductInfo(
-#             product_name="Laptop",
-#             brand="Dell",
-#             category="Electronics",
-#             price_range="1000-1500 USD",
-#             features=["lightweight", "long battery life"]
-#         )
-#     elif "t-shirt" in query.lower():
-#         return ProductInfo(
-#             product_name="T-Shirt",
-#             brand="Nike",
-#             category="Apparel",
-#             features=["cotton", "crew neck"]
-#         )
-#     else:
-#         return ProductInfo(product_name="Unknown Product")
-
-# product_extractor_agent = agent_builder.build()
+product_extractor_agent = agent_builder.build()
 
 # Example usage (conceptual):
-# response = product_extractor_agent.run("I'm looking for a lightweight Dell laptop with a long battery life around $1200.")
-# print(response)
+response = product_extractor_agent.run("I'm looking for a lightweight Dell laptop with a long battery life around $1200.")
+print(response)
 # # Expected output would be an instance of ProductInfo, validated and typed.
+```
 
 ## 5. Conclusion: Embracing Structure for Reliable AI Applications
 
